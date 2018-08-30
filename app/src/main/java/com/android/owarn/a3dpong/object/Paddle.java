@@ -148,6 +148,8 @@ public class Paddle extends GameObject{
 
     private boolean isPlayer = false;
 
+    private float r, b, g;
+
     public Paddle(Context c, float y, GameState gs) {
         super(c, new ShaderCode(c, R.raw.simple_fragment_shader, R.raw.simple_vertex_shader), vertexData, normalData, gs);
 
@@ -164,6 +166,9 @@ public class Paddle extends GameObject{
 
         shader.setAtrribPointer(0, aPositionLocation, 3, 12, true);
         shader.setAtrribPointer(0, aNormalLocation, 3, 12, false);
+        this.r = Lang.six.nR;
+        this.g = Lang.six.nG;
+        this.b = Lang.six.nB;
     }
     @Override
     public void Start() {
@@ -188,7 +193,7 @@ public class Paddle extends GameObject{
 
         glUniformMatrix4fv(uMatrixLocation, 1, false, modelViewProjectionMatrix, 0);
         glUniformMatrix4fv(uModelViewMatrixLocation, 1, false, modelViewMatrix, 0);
-        glUniform4f(uColorLocation, Lang.six.nR,Lang.six.nG,Lang.six.nB,1.0f);
+        glUniform4f(uColorLocation, r, g, b,1.0f);
 
         shader.setAtrribPointer(0, aPositionLocation, 3, 12, true);
         shader.setAtrribPointer(0, aNormalLocation, 3, 12, false);
@@ -240,5 +245,12 @@ public class Paddle extends GameObject{
     public void setDummy()
     {
         isDummy = true;
+    }
+
+    public void setColour(Lang.Color color)
+    {
+        this.r = color.nR;
+        this.g = color.nG;
+        this.b = color.nB;
     }
 }

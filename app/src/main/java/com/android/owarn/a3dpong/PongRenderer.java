@@ -1,13 +1,13 @@
 package com.android.owarn.a3dpong;
-/* 
-Property of Oscar Warne (Pls don't steal my code)
-*/
+/**
+ * Created by Oscar Warne on 27/06/2018 for 3DPong.
+ */
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import com.android.owarn.a3dpong.gameState.Credits;
+import com.android.owarn.a3dpong.gameState.ServerBrowser;
 import com.android.owarn.a3dpong.gameState.GameState;
 import com.android.owarn.a3dpong.gameState.InGame;
 import com.android.owarn.a3dpong.gameState.Title;
@@ -51,33 +51,42 @@ public class PongRenderer implements GLSurfaceView.Renderer {
     private Lang.GameState currentState;
     private GameState currentGameState;
     private FPSCounter counter;
+    private float rotationX, rotationY;
+    private float offsetX, offsetY;
+    private boolean glStartFlag = true;
 
     public PongRenderer(Context context)
     {
         this.context = context;
-
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         glClearColor(Lang.four.nR, Lang.four.nG, Lang.four.nB, 1.0f);
-        changeGameState(Lang.GameState.inGame);
-        this.counter = new FPSCounter();
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
         glViewport(0, 0, width, height);
         // Create perspective project with required aspect and field of vision
-        perspectiveM(projectionMatrix, 45, (float) width / (float) height, 1f, 100f);
+        perspectiveM(projectionMatrix, 50, (float) width / (float) height, 1f, 100f);
         setLookAtM(viewMatrix, 0, 0f, 0.0f, 3f, 0f, 0f, 0f, 0f, 1f, 0f);
-        //rotateM(viewMatrix, 0, 0.0f, 0.0f, 0.0f, 0.0f);
-        rotateM(viewMatrix, 0, 360.0f, 0.0f, 1.0f, 0.0f);
+
     }
 
     @Override
     public void onDrawFrame(GL10 gl10) {
+        if(glStartFlag)
+        {
+            glStartFlag = false;
+            changeGameState(Lang.GameState.TITLE);
+            this.counter = new FPSCounter();
+        }
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        setLookAtM(viewMatrix, 0, 0f, 0.0f, 3f, 0f, 0f, 0f, 0f, 1f, 0f);
+        rotateM(viewMatrix, 0, rotationX - offsetX, 0.0f, 1.0f, 0.0f);
+        rotateM(viewMatrix, 0, rotationY - offsetY, 1.0f, 0.0f, 0.0f);
 
         counter.logFrame();
         // Combine the view and perspective projection matrices
@@ -152,25 +161,36 @@ public class PongRenderer implements GLSurfaceView.Renderer {
     }
     private GameState enumToGameState(Lang.GameState gameState)
     {
-        if(gameState == Lang.GameState.inGame){
+        if(gameState == Lang.GameState.IN_GAME){
             return new InGame(context, this);
         }
-        if(gameState == Lang.GameState.title){
+        if(gameState == Lang.GameState.TITLE){
             return new Title(context, this);
         }
-        if(gameState == Lang.GameState.credits){
-            return new Credits(context, this);
+        if(gameState == Lang.GameState.SERVER_BROWSER){
+            return new ServerBrowser(context, this);
         }
-        else{
-            Log.e("EnumToGameState", "Could not convert enum to gameState");
-            return null;
+        if(gameState == Lang.GameState.exit)
+        {
+            System.exit(0);
         }
+        Log.e("EnumToGameState", "Could not convert enum to gameState");
+        return null;
     }
-    public void handleTouchPress(float normalisedX, float normalisedY){
+
+    public void handleTouchPress(float normalisedX, float normalisedY)
+    {
         currentGameState.handleTouchPress(normalisedX, normalisedY, convertNormalised2DPointToRay(normalisedX, normalisedY));
     }
-    public void handleTouchDrag(float normalisedX, float normalisedY){
+
+    public void handleTouchDrag(float normalisedX, float normalisedY)
+    {
         currentGameState.handleTouchDrag(normalisedX, normalisedY, convertNormalised2DPointToRay(normalisedX, normalisedY));
+    }
+
+    public void handleTouchRelease(float normalisedX, float normalisedY)
+    {
+        currentGameState.handleTouchRelease(normalisedX, normalisedY, convertNormalised2DPointToRay(normalisedX, normalisedY));
     }
 
     public Ray convertNormalised2DPointToRay(float normalisedX, float normalisedY)
@@ -204,6 +224,20 @@ public class PongRenderer implements GLSurfaceView.Renderer {
                 to.y - from.y,
                 to.z - from.z
         );
+    }
+    public void setOrientation(float[] orientation)
+    {
+        rotationX = limit((((rotationX * 20) + (orientation[2] * 30.0f)) / 21.0f), -35, 35);
+        rotationY = limit((((rotationY * 20) + (orientation[1] * 20.0f)) / 21.0f), -15, 15);
+    }
+    public float limit(float value, float min, float max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    public void doubleTap()
+    {
+        offsetX = rotationX;
+        offsetY = rotationY;
     }
 
 }

@@ -12,12 +12,16 @@ public class Lang {
     public static final String U_MVMATRIX = "u_MVMatrix";
     public static final String U_COLOR = "u_Color";
     public static final String U_LIGHTPOS = "u_LightPos";
+    public static final String U_CIRCLEPOS = "u_CirclePos";
+    public static final String U_TIME = "u_Time";
+    public static final String U_INVERT = "u_Invert";
 
     public enum GameState
     {
-        title,
-        inGame,
-        credits
+        TITLE,
+        IN_GAME,
+        SERVER_BROWSER,
+        exit
     }
     public enum Side
     {
@@ -34,6 +38,9 @@ public class Lang {
     public static final Color four = new Color(40, 40, 40);
     public static final Color five = new Color(12, 0, 50);
     public static final Color six = new Color(70, 73, 76);
+
+    public static a3DPongServerBrowser.Server server = null;
+    public static String disconnectReason = " ";
 
     private static boolean onSegment(Point p, Point q, Point r)
     {

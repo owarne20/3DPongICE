@@ -7,6 +7,9 @@ import com.android.owarn.a3dpong.R;
 import com.android.owarn.a3dpong.gameState.GameState;
 import com.android.owarn.a3dpong.shader.ShaderCode;
 import com.android.owarn.a3dpong.util.Lang;
+import com.android.owarn.a3dpong.util.Point;
+
+import a3DPongServerBrowser.Server;
 
 import static android.opengl.GLES20.GL_LINE_STRIP;
 import static android.opengl.GLES20.glDrawArrays;
@@ -33,31 +36,31 @@ public class Text extends GameObject{
     private final int[] charLengths =
             {
                     //A
-                    0,
+                    3,
                     //B
-                    0,
+                    6,
                     //C
-                    0,
+                    4,
                     //D
                     0,
                     //E
                     7,
                     //F
-                    0,
+                    6,
                     //G
                     6,
                     //H
-                    0,
+                    6,
                     //I
-                    0,
+                    6,
                     //J
                     0,
                     //K
-                    0,
+                    6,
                     //L
                     3,
                     //M
-                    0,
+                    5,
                     //N
                     4,
                     //O
@@ -67,29 +70,47 @@ public class Text extends GameObject{
                     //Q
                     0,
                     //R
-                    0,
+                    5,
                     //S
-                    0,
+                    6,
                     //T
                     4,
                     //U
-                    0,
+                    4,
                     //V
-                    0,
+                    3,
                     //W
                     0,
                     //X
                     7,
                     //Y
-                    0,
+                    5,
                     //Z
                     0,
                     //>
                     3,
+                    //_
+                    0,
             };
 
     private static final float[] vertexData =
             {
+                    //A
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                                 0.0f,  charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    //B
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                                 0.0f,               0.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    //C
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
                     //E
                      charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
                     -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
@@ -98,7 +119,13 @@ public class Text extends GameObject{
                     -charWidth / 2.0f,               0.0f, 0.0f,
                     -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
                      charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
-
+                    //F
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,               0.0f, 0.0f,
+                     charWidth / 2.0f,               0.0f, 0.0f,
                     //G
                      charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
                     -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
@@ -106,9 +133,36 @@ public class Text extends GameObject{
                      charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
                      charWidth / 2.0f,               0.0f, 0.0f,
                                  0.0f,               0.0f, 0.0f,
+                    //H
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,               0.0f, 0.0f,
+                     charWidth / 2.0f,               0.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    //I
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                                 0.0f, -charHeight / 2.0f, 0.0f,
+                                 0.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    //K
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,               0.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,               0.0f, 0.0f,
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
                     //L
                     -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
                     -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    //M
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                                 0.0f, -charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
                      charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
                     //N
                     -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
@@ -128,12 +182,33 @@ public class Text extends GameObject{
                      charWidth / 2.0f,               0.0f, 0.0f,
                     -charWidth / 2.0f,               0.0f, 0.0f,
                     //R
-                    //-charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f,               0.0f, 0.0f,
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                    //S
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f,               0.0f, 0.0f,
+                    -charWidth / 2.0f,               0.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+
                     //T
                      charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
                     -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
                                  0.0f,  charHeight / 2.0f, 0.0f,
                                  0.0f, -charHeight / 2.0f, 0.0f,
+                    //U
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    //V
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                                 0.0f, -charHeight / 2.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
                     //X
                     -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
                                  0.0f,               0.0f, 0.0f,
@@ -142,6 +217,12 @@ public class Text extends GameObject{
                      charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
                                  0.0f,               0.0f, 0.0f,
                     -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                    //Y
+                                 0.0f, -charHeight / 2.0f, 0.0f,
+                                 0.0f,               0.0f, 0.0f,
+                    -charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
+                                 0.0f,               0.0f, 0.0f,
+                     charWidth / 2.0f,  charHeight / 2.0f, 0.0f,
                     //>
                     -charWidth / 2.0f, -charHeight / 2.0f, 0.0f,
                      charWidth / 2.0f,               0.0f, 0.0f,
@@ -155,6 +236,14 @@ public class Text extends GameObject{
 
     private DrawText text;
 
+    private boolean pressed;
+
+    private float length;
+
+    private String currentText;
+
+    private Server server;
+
     public Text(Context c, GameState gs, float x, float y) {
         super(c, new ShaderCode(c, R.raw.unlit_fragment_shader, R.raw.unlit_vertex_shader), vertexData, normalData, gs);
 
@@ -167,7 +256,7 @@ public class Text extends GameObject{
 
         shader.setAtrribPointer(0, aPositionLocation, 3, 12, true);
 
-        //Set number to zero at initialisation to avoid null pointer exception
+        //Set string to 'a' at initialisation to avoid null pointer exception
         setText("a");
 
         this.x = x;
@@ -196,8 +285,12 @@ public class Text extends GameObject{
 
     public void setText(String s)
     {
-
+        Log.e("Text", s);
         int[] letters = new int[s.length()];
+
+        length = s.length() * charWidth;
+
+        currentText = s;
 
         for(int j = 0; j < letters.length; j++)
         {
@@ -207,7 +300,10 @@ public class Text extends GameObject{
             {
                 letters[j] = 26;
             }
-            Log.e("Text",String.valueOf(letters[j]));
+            if(ch == ' ')
+            {
+                letters[j] = 27;
+            }
         }
         float center = 0; //(((iStr.length() - 1) * charWidth));
 
@@ -222,11 +318,15 @@ public class Text extends GameObject{
 
     private void drawLetter(int i, float x, float y, float[] vpMatrix)
     {
-        assert i < 10 && i >= 0;
 
         float [] modelViewProjectionMatrix = positionObject(x, y,0.14f, vpMatrix, 1.0f, 1.0f, 1.0f);
         glUniformMatrix4fv(uMatrixLocation, 1, false, modelViewProjectionMatrix, 0);
-        glUniform4f(uColorLocation, Lang.three.nR,Lang.three.nG,Lang.three.nB,1.0f);
+        if(pressed)
+        {
+            glUniform4f(uColorLocation, Lang.six.nR, Lang.six.nG, Lang.six.nB,1.0f);
+        } else{
+            glUniform4f(uColorLocation, Lang.two.nR, Lang.two.nG, Lang.two.nB,1.0f);
+        }
 
         int offset = 0;
 
@@ -244,6 +344,49 @@ public class Text extends GameObject{
     interface DrawText
     {
         void draw(float[] vpMatrix);
+    }
+
+    public void setPressed(boolean pressed, String text)
+    {
+        if(this.pressed == pressed)
+        {
+            return;
+        }
+        this.pressed = pressed;
+
+        setText(text);
+    }
+
+    public boolean isPressed()
+    {
+        return pressed;
+    }
+
+    public Point getTopLeftBound()
+    {
+
+         return new Point(x, y + charHeight / 2.0f, 0.14f);
+    }
+
+    public Point getBottomRightBound()
+    {
+
+        return new Point(x + length, y - charHeight / 2.0f, 0.14f);
+    }
+
+    public String getText()
+    {
+        return currentText;
+    }
+
+    public void setServer(Server server)
+    {
+        this.server = server;
+    }
+
+    public Server getServer()
+    {
+        return server;
     }
 
 }

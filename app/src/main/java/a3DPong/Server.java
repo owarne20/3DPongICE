@@ -38,6 +38,8 @@ public interface Server extends com.zeroc.Ice.Object
 
     void timeModifier(float t, com.zeroc.Ice.Current current);
 
+    void sendScore(int score, byte side, com.zeroc.Ice.Current current);
+
     static final String[] _iceIds =
     {
         "::Ice::Object",
@@ -163,6 +165,19 @@ public interface Server extends com.zeroc.Ice.Object
         return inS.setResult(inS.writeEmptyParams());
     }
 
+    static java.util.concurrent.CompletionStage<com.zeroc.Ice.OutputStream> _iceD_sendScore(Server obj, final com.zeroc.IceInternal.Incoming inS, com.zeroc.Ice.Current current)
+    {
+        com.zeroc.Ice.Object._iceCheckMode(null, current.mode);
+        com.zeroc.Ice.InputStream istr = inS.startReadParams();
+        int iceP_score;
+        byte iceP_side;
+        iceP_score = istr.readInt();
+        iceP_side = istr.readByte();
+        inS.endReadParams();
+        obj.sendScore(iceP_score, iceP_side, current);
+        return inS.setResult(inS.writeEmptyParams());
+    }
+
     final static String[] _iceOps =
     {
         "disconnect",
@@ -173,6 +188,7 @@ public interface Server extends com.zeroc.Ice.Object
         "ready",
         "sendBallPositionAndVector",
         "sendPaddlePositionX",
+        "sendScore",
         "sendTime",
         "startDirectionHint",
         "startGame",
@@ -225,17 +241,21 @@ public interface Server extends com.zeroc.Ice.Object
             }
             case 8:
             {
-                return _iceD_sendTime(this, in, current);
+                return _iceD_sendScore(this, in, current);
             }
             case 9:
             {
-                return _iceD_startDirectionHint(this, in, current);
+                return _iceD_sendTime(this, in, current);
             }
             case 10:
             {
-                return _iceD_startGame(this, in, current);
+                return _iceD_startDirectionHint(this, in, current);
             }
             case 11:
+            {
+                return _iceD_startGame(this, in, current);
+            }
+            case 12:
             {
                 return _iceD_timeModifier(this, in, current);
             }

@@ -68,7 +68,7 @@ public class Line extends GameObject{
 
         glUniformMatrix4fv(uMatrixLocation, 1, false, modelViewProjectionMatrix, 0);
 
-        glUniform4f(uColorLocation, Lang.three.nR,Lang.three.nG,Lang.three.nB,1.0f);
+        glUniform4f(uColorLocation, Lang.two.nR,Lang.two.nG,Lang.two.nB,1.0f);
 
         shader.setAtrribPointer(0, aPositionLocation, 3, 12, true);
 

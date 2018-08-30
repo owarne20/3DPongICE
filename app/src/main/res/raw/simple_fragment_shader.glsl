@@ -12,5 +12,5 @@ void main()
     float diffuse = max(dot(v_Normal, lightVector), 0.1);
     float strength = 1.4;
     diffuse = diffuse * (1.0 / (1.0 + (0.25 * distance * distance))) * strength;
-    gl_FragColor = u_Color * diffuse;
+    gl_FragColor = vec4(vec3(u_Color) * diffuse, u_Color.a);
 }

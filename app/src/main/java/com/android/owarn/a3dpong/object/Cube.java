@@ -154,6 +154,8 @@ public class Cube extends GameObject{
 
     private final float[] lightPosInEyeSpace = new float[4];
 
+    private float r, g, b;
+
     public Cube(float positionX, float positionY, Context c, GameState gs) {
         // Send required information to superclass for setup
         super(c, new ShaderCode(c, R.raw.simple_fragment_shader, R.raw.simple_vertex_shader), vertexData3D, normalData, gs);
@@ -174,6 +176,9 @@ public class Cube extends GameObject{
 
         shader.setAtrribPointer(0, aPositionLocation, 3, 12, true);
         shader.setAtrribPointer(0, aNormalLocation, 3, 12, false);
+        r = Lang.two.nR;
+        g = Lang.two.nG;
+        b = Lang.two.nB;
     }
 
     @Override
@@ -205,7 +210,7 @@ public class Cube extends GameObject{
 
         glUniformMatrix4fv(uMatrixLocation, 1, false, modelViewProjectionMatrix, 0);
         glUniformMatrix4fv(uModelViewMatrixLocation, 1, false, modelViewMatrix, 0);
-        glUniform4f(uColorLocation, Lang.three.nR,Lang.three.nG,Lang.three.nB,1.0f);
+        glUniform4f(uColorLocation, r, g, b,1.0f);
 
         shader.setAtrribPointer(0, aPositionLocation, 3, 12, true);
         shader.setAtrribPointer(0, aNormalLocation, 3, 12, false);
@@ -227,7 +232,6 @@ public class Cube extends GameObject{
             glUniform4f(uColorLocation, Lang.six.nR, Lang.six.nG, Lang.six.nB, (float) lightness);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-        System.out.println();
     }
 
     @Override
@@ -338,6 +342,15 @@ public class Cube extends GameObject{
         this.direction.x = vX;
         this.direction.y = vY;
     }
+
+    public void setPositionAndVectorNoSmooth(float x, float y, float vX, float vY)
+    {
+        this.position.x = x;
+        this.position.y = y;
+        this.direction.x = vX;
+        this.direction.y = vY;
+    }
+
     public void setVectorAndStartGame(float vX, float vY){
         this.direction.x = vX;
         this.direction.y = vY;
@@ -349,7 +362,6 @@ public class Cube extends GameObject{
         for(int i = 0; i < previousPositions.length; i++)
         {
             if(i == previousPositions.length - 1){
-                //System.out.println(i + " " + previousPositions.length);
                 break;
             }
             tmp[i + 1] = previousPositions[i];
@@ -361,6 +373,17 @@ public class Cube extends GameObject{
     public void toggleVisible()
     {
         visible = !visible;
+    }
+    public void setVisibility(boolean visible)
+    {
+        this.visible = visible;
+    }
+
+    public void setColor(Lang.Color c)
+    {
+        r = c.nR;
+        g = c.nG;
+        b = c.nB;
     }
 
     public Point getPosition()

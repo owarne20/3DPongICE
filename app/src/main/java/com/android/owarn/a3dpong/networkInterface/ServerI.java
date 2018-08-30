@@ -3,6 +3,7 @@ package com.android.owarn.a3dpong.networkInterface;
 import android.util.Log;
 
 import com.android.owarn.a3dpong.gameState.InGame;
+import com.android.owarn.a3dpong.util.Lang;
 import com.zeroc.Ice.Current;
 
 import a3DPong.Server;
@@ -23,8 +24,6 @@ public class ServerI implements Server{
     public void sendBallPositionAndVector(float x, float y, float vX, float vY, Current current)
     {
         inGame.setBallPositionAndVector(x, y, vX, vY);
-        //Log.e("Network", "sendBallPositionAndVector");
-
     }
 
     @Override
@@ -37,7 +36,9 @@ public class ServerI implements Server{
     @Override
     public void startDirectionHint(float vX, float vY, int seconds, int padding, Current current)
     {
-        double angleInRadians = Math.atan(vY/vX);
+        Log.e("Network","vX: " + vX + " vY: " + vY);
+        double angleInRadians = Math.toRadians(Math.toDegrees(Math.atan2(vY, vX)));
+        Log.e("Network",String.valueOf(Math.toDegrees(angleInRadians)));
         inGame.setDirectionHint((float) Math.toDegrees(angleInRadians), seconds, padding);
         Log.e("Network", "startDirectionHint");
     }
@@ -45,9 +46,9 @@ public class ServerI implements Server{
     @Override
     public void disconnect(String reason, Current current)
     {
+        Log.e("Network", reason);
+        Lang.disconnectReason = reason.toLowerCase();
         inGame.disconnect();
-        Log.e("Network", "disconnect");
-
     }
 
     @Override
@@ -59,7 +60,7 @@ public class ServerI implements Server{
     @Override
     public void sendTime(float timeInSeconds, Current current)
     {
-        //Log.e("Network", "sendTime");
+        Log.e("Network", "sendTime");
         inGame.setTimer(timeInSeconds);
     }
 
@@ -74,5 +75,11 @@ public class ServerI implements Server{
     public void timeModifier(float t, Current current) {
         Log.e("Network", "timeModifier");
 
+    }
+
+    @Override
+    public void sendScore(int score, byte side, Current current) {
+        inGame.setScore(score, side);
+        Log.e("Network", "Score received");
     }
 }

@@ -1,14 +1,11 @@
 package com.android.owarn.a3dpong.object;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.owarn.a3dpong.R;
 import com.android.owarn.a3dpong.gameState.GameState;
 import com.android.owarn.a3dpong.shader.ShaderCode;
 import com.android.owarn.a3dpong.util.Lang;
-
-import java.util.Random;
 
 import static android.opengl.GLES20.GL_LINES;
 import static android.opengl.GLES20.GL_POINTS;
@@ -79,7 +76,7 @@ public class DirectionHint extends GameObject{
 
         glUniformMatrix4fv(uMatrixLocation, 1, false, modelViewProjectionMatrix, 0);
 
-        glUniform4f(uColorLocation, Lang.three.nR,Lang.three.nG,Lang.three.nB,1.0f);
+        glUniform4f(uColorLocation, Lang.six.nR,Lang.six.nG,Lang.six.nB,1.0f);
 
         shader.setAtrribPointer(0, aPositionLocation, 3, 12, true);
 
@@ -101,7 +98,6 @@ public class DirectionHint extends GameObject{
         }
         if(System.nanoTime() > timeAtStart + nanosecondsToComplete + nanosecondPadding)
         {
-            Log.e("DHint","noooooo");
             visible = false;
         }
     }
@@ -110,14 +106,12 @@ public class DirectionHint extends GameObject{
         this.startX = startX;
         this.startY = startY;
         double angleInRadians = Math.toRadians(rotationInDegrees);
-        lengthX = (float) Math.sin(angleInRadians) * length;
-        lengthY = (float) Math.cos(angleInRadians) * length;
+        lengthX = (float) Math.cos(angleInRadians) * length;
+        lengthY = (float) Math.sin(angleInRadians) * length;
     }
     public void setRotationAndTime(float rotationInDegrees, float secondsToComplete, float secondsPadding)
     {
-        Random r = new Random();
-        int rots = r.nextInt(5);
-        angleToReach = (rots * 360) + rotationInDegrees;
+        angleToReach = 360 + rotationInDegrees;
         nanosecondsToComplete = (long) secondsToComplete * 1000000000L;
         nanosecondPadding = (long) secondsPadding * 1000000000L;
         timeAtStart = System.nanoTime();
@@ -127,12 +121,20 @@ public class DirectionHint extends GameObject{
     {
         double secondsThrough = nanoSecondsThrough / 1000000000d;
         double secondsToComplete = nanosecondsToComplete / 1000000000d;
-        return finalValue * (float) (secondsThrough / secondsToComplete);
+        double toZero = 1 - (secondsThrough / secondsToComplete);
+        double multiplier = 0.5;
+        double exponential = Math.pow(finalValue, (toZero * multiplier) + 1);
+        //Log.e("DHint", "Exp: " + exponential);
+        return exponential;
     }
     public void toggleVisible()
     {
+        //TODO: setVisibility()
         visible = !visible;
-        Log.e("DHint", String.valueOf(visible));
+    }
+    public void setVisibility(boolean visible)
+    {
+        this.visible = visible;
     }
 }
 

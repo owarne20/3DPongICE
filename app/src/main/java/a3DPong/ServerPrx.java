@@ -261,6 +261,36 @@ public interface ServerPrx extends com.zeroc.Ice.ObjectPrx
         return f;
     }
 
+    default void sendScore(int score, byte side)
+    {
+        sendScore(score, side, com.zeroc.Ice.ObjectPrx.noExplicitContext);
+    }
+
+    default void sendScore(int score, byte side, java.util.Map<String, String> context)
+    {
+        _iceI_sendScoreAsync(score, side, context, true).waitForResponse();
+    }
+
+    default java.util.concurrent.CompletableFuture<Void> sendScoreAsync(int score, byte side)
+    {
+        return _iceI_sendScoreAsync(score, side, com.zeroc.Ice.ObjectPrx.noExplicitContext, false);
+    }
+
+    default java.util.concurrent.CompletableFuture<Void> sendScoreAsync(int score, byte side, java.util.Map<String, String> context)
+    {
+        return _iceI_sendScoreAsync(score, side, context, false);
+    }
+
+    default com.zeroc.IceInternal.OutgoingAsync<Void> _iceI_sendScoreAsync(int iceP_score, byte iceP_side, java.util.Map<String, String> context, boolean sync)
+    {
+        com.zeroc.IceInternal.OutgoingAsync<Void> f = new com.zeroc.IceInternal.OutgoingAsync<>(this, "sendScore", null, sync, null);
+        f.invoke(false, context, null, ostr -> {
+                     ostr.writeInt(iceP_score);
+                     ostr.writeByte(iceP_side);
+                 }, null);
+        return f;
+    }
+
     /**
      * Contacts the remote server to verify that the object implements this type.
      * Raises a local exception if a communication error occurs.

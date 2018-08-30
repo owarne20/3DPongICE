@@ -22,6 +22,9 @@ public abstract class GameState {
 
     protected PongRenderer pongRenderer;
 
+    public boolean flagChange;
+    public Lang.GameState toChange;
+
     protected GameState(Lang.GameState gs, Context c, PongRenderer pr)
     {
         gameState = gs;
@@ -54,11 +57,18 @@ public abstract class GameState {
 
     public abstract void handleTouchDrag(float normalisedX, float normalisedY, Ray ray);
 
+    public abstract void handleTouchRelease(float normalisedX, float normalisedY, Ray ray);
+
     public GameObject getGameObject(int i)
     {
         if(i > gameObjects.size()){
             return null;
         }
         return gameObjects.get(i);
+    }
+    public void flagGamestateChange(Lang.GameState state)
+    {
+        toChange = state;
+        flagChange = true;
     }
 }

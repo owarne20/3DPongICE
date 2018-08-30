@@ -192,13 +192,13 @@ public class Number extends GameObject{
         {
             digits[j] = Integer.valueOf(String.valueOf(iStr.charAt(j)));
         }
-        float center = 0; //(((iStr.length() - 1) * charWidth));
+        float center = ((((iStr.length() * 2) - 0) * charWidth / 2));
 
         drawNumber = vpMatrix ->
         {
             for(int k = 0; k < iStr.length(); k++)
             {
-                drawNumber(digits[k], x + (k * (charWidth + charPadding)) - center, y, vpMatrix);
+                drawNumber(digits[k], x + (k * (charWidth + charPadding)) - center + charWidth, y, vpMatrix);
             }
         };
     }
@@ -209,7 +209,7 @@ public class Number extends GameObject{
 
         float [] modelViewProjectionMatrix = positionObject(x, y,0.1f, vpMatrix, 1.0f, 1.0f, 1.0f);
         glUniformMatrix4fv(uMatrixLocation, 1, false, modelViewProjectionMatrix, 0);
-        glUniform4f(uColorLocation, Lang.three.nR,Lang.three.nG,Lang.three.nB,1.0f);
+        glUniform4f(uColorLocation, Lang.two.nR,Lang.two.nG,Lang.two.nB,1.0f);
 
         int offset = 0;
 
@@ -233,6 +233,10 @@ public class Number extends GameObject{
     {
         visible = !visible;
         //Log.e("Number", "Visible = " + String.valueOf(visible));
+    }
+    public void setVisibility(boolean visible)
+    {
+        this.visible = visible;
     }
 
 }

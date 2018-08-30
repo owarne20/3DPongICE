@@ -6,6 +6,7 @@ import android.util.Log;
 import com.android.owarn.a3dpong.PongRenderer;
 import com.android.owarn.a3dpong.networkInterface.ServerI;
 import com.android.owarn.a3dpong.object.Border;
+import com.android.owarn.a3dpong.object.CircularTransition;
 import com.android.owarn.a3dpong.object.Cube;
 import com.android.owarn.a3dpong.object.DirectionHint;
 import com.android.owarn.a3dpong.object.GameBoard;
@@ -21,8 +22,10 @@ import com.android.owarn.a3dpong.util.Sphere;
 import com.android.owarn.a3dpong.util.Vector;
 import com.zeroc.Ice.Communicator;
 import com.zeroc.Ice.ConnectTimeoutException;
-import com.zeroc.Ice.ObjectAdapter;
+import com.zeroc.Ice.InitializationData;
+import com.zeroc.Ice.Properties;
 import com.zeroc.Ice.SocketException;
+import com.zeroc.Ice.Util;
 
 import a3DPong.ClientPrx;
 import a3DPong.ServerPrx;
@@ -44,23 +47,28 @@ public class InGame extends GameState{
     private float touchedX = 0;
     private byte side = 1;
 
+    private long last;
+    private long start;
+    private boolean colour;
+
     public InGame(Context c, PongRenderer pr)
     {
-        super(Lang.GameState.inGame, c, pr);
+        super(Lang.GameState.IN_GAME, c, pr);
     }
 
     @Override
     public void update()
     {
         gameObjects.get(9).update();
+        gameObjects.get(10).update();
          if(serverReady) {
              client.sendPaddlePositionXAsync(((Paddle) gameObjects.get(2 + side)).position.x);
          }
 
         if(flagChange)
         {
-            pongRenderer.changeGameState(Lang.GameState.title);
             flagChange = false;
+            pongRenderer.changeGameState(Lang.GameState.TITLE);
             return;
         }
 
@@ -72,6 +80,24 @@ public class InGame extends GameState{
             {
                 go.update();
             }
+
+            if((System.nanoTime() - last) > 0.2f * 1000000000L && (System.nanoTime() - start) < 4f * 1000000000L)
+            {
+                last = System.nanoTime();
+                if(colour)
+                {
+                    ((Paddle) gameObjects.get(2 + side)).setColour(Lang.two);
+                }
+                else {
+                    ((Paddle) gameObjects.get(2 + side)).setColour(Lang.six);
+                }
+                colour = !colour;
+            }
+            if((System.nanoTime() - start) > 4f * 1000000000L)
+            {
+                ((Paddle) gameObjects.get(2 + side)).setColour(Lang.six);
+            }
+
         }
 
     }
@@ -81,7 +107,7 @@ public class InGame extends GameState{
     {
         if(flagChange)
         {
-            pongRenderer.changeGameState(Lang.GameState.title);
+            pongRenderer.changeGameState(Lang.GameState.TITLE);
             flagChange = false;
             return;
         }
@@ -104,6 +130,9 @@ public class InGame extends GameState{
         initialiseGameObject(new Number(context, this,  0.0f, -0.2f));
         initialiseGameObject(new Number(context, this, 0.0f, 0.0f));
         initialiseGameObject(new DirectionHint(context, 0.0f, 0.0f, 0.0f, 0.0f, this));
+        initialiseGameObject(new CircularTransition(context, this));
+        //initialiseGameObject(new Text(context, this, 0.3f, 1.1f));
+        //((Text) gameObjects.get(11)).setText(">back");
 
         //TODO: Make a better way to get GameObjects from a state
         ((Number) gameObjects.get(6)).setNumber(0);
@@ -130,6 +159,7 @@ public class InGame extends GameState{
             gameClient.stop();
         }
 
+            gameClient = null;
         connected = false;
     }
     public void serverReady(byte b)
@@ -137,7 +167,12 @@ public class InGame extends GameState{
         //Triggered when server is ready to receive information this will not occur until both clients have connected
 
         ((Paddle) gameObjects.get(2 + b)).setPlayer();
-        ((Number) gameObjects.get(8)).toggleVisible();
+        ((Number) gameObjects.get(8)).setVisibility(true);
+        ((Number) gameObjects.get(7)).setVisibility(false);
+        ((Number) gameObjects.get(6)).setVisibility(false);
+        ((Cube) gameObjects.get(5)).setVisibility(false);
+        ((Cube) gameObjects.get(5)).setPositionAndVectorNoSmooth(0.0f, 0.0f, 0.0f, 0.0f);
+
         serverReady = true;
         side = b;
     }
@@ -147,12 +182,20 @@ public class InGame extends GameState{
         ((Cube) gameObjects.get(5)).setPositionAndVector(x, y, vX, vY);
     }
 
+    public void setScore(int score, byte side)
+    {
+        //Triggered twice every time someone scores
+        ((CircularTransition) gameObjects.get(10)).doAnimation(((Cube) gameObjects.get(5)).getPosition());
+        ((Number) gameObjects.get(7 - side)).setNumber(score);
+        ((Cube) gameObjects.get(5)).setVisibility(false);
+    }
+
     public void startGame(float vX, float vY)
     {
         ((Cube) gameObjects.get(5)).setVectorAndStartGame(vX, vY);
-        ((Number) gameObjects.get(6)).toggleVisible();
-        ((Number) gameObjects.get(7)).toggleVisible();
-        ((DirectionHint) gameObjects.get(9)).toggleVisible();
+        ((Number) gameObjects.get(6)).setVisibility(true);
+        ((Number) gameObjects.get(7)).setVisibility(true);
+        ((DirectionHint) gameObjects.get(9)).setVisibility(false);
     }
 
     public void setTimer(float t)
@@ -168,9 +211,13 @@ public class InGame extends GameState{
     public void setDirectionHint(float rotationInDegrees, float seconds, float padding)
     {
         ((DirectionHint) gameObjects.get(9)).setRotationAndTime(rotationInDegrees, seconds, padding);
-        ((DirectionHint) gameObjects.get(9)).toggleVisible();
-        ((Number) gameObjects.get(8)).toggleVisible();
-        ((Cube) gameObjects.get(5)).toggleVisible();
+        ((DirectionHint) gameObjects.get(9)).setVisibility(true);
+        ((Number) gameObjects.get(8)).setVisibility(false);
+        ((Number) gameObjects.get(6)).setVisibility(false);
+        ((Number) gameObjects.get(7)).setVisibility(false);
+        ((Cube) gameObjects.get(5)).setVisibility(true);
+        ((Cube) gameObjects.get(5)).setPositionAndVectorNoSmooth(0.0f, 0.0f, 0.0f, 0.0f);
+        start = System.nanoTime();
     }
 
     private class GameClient implements Runnable
@@ -190,12 +237,31 @@ public class InGame extends GameState{
         {
             try
             {
-                communicator = com.zeroc.Ice.Util.initialize();
+
+                Properties properties = Util.createProperties();
+                properties.setProperty("Ice.ACM.Close", "0");
+                properties.setProperty("Ice.ACM.Heartbeat", "3");
+                properties.setProperty("Ice.ACM.Timeout", "30");
+                InitializationData id = new InitializationData();
+                id.properties = properties;
+
+                if(Lang.server == null)
+                {
+                    flagGamestateChange(Lang.GameState.TITLE);
+                    flagChange = true;
+                    return;
+                }
+
+                String address = Lang.server.address;
+                String port = Lang.server.port;
+
+                communicator = com.zeroc.Ice.Util.initialize(id);
                 ClientPrx clientPrx = ClientPrx.checkedCast(
-                        communicator.stringToProxy("client:default -h 192.168.137.1 -p 10000")).ice_twoway().ice_timeout(-1).ice_secure(false).ice_collocationOptimized(false).ice_compress(true);
+                        communicator.stringToProxy("client:default -h " + address + " -p " + port)).ice_twoway().ice_secure(false).ice_collocationOptimized(false).ice_compress(true);
 
                 if(clientPrx == null)
                 {
+                    //If connection is failed due to server problems
                     Log.e("Network","Invalid proxy");
                     serverReady = false;
                     flagChange = true;
@@ -203,14 +269,12 @@ public class InGame extends GameState{
                     return;
                 }
                 Log.e("Network", "Connected");
-                ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("callbackClient", "default");
-                adapter.add(new ServerI(game), com.zeroc.Ice.Util.stringToIdentity("server"));
-                adapter.activate();
 
-                ServerPrx receiver =
-                        ServerPrx.uncheckedCast(adapter.createProxy(
-                                com.zeroc.Ice.Util.stringToIdentity("server")));
-                clientPrx.sendServerCallback(receiver);
+                //Send a callback to the server so that its connection is not trying to punch through a firewall
+                com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("");
+                ServerPrx cbPrx = ServerPrx.uncheckedCast(adapter.addWithUUID(new ServerI(game)));
+                clientPrx.ice_getConnection().setAdapter(adapter);
+                clientPrx.sendServerCallback(cbPrx);
 
                 Log.e("Network","Sent callback to server");
 
@@ -225,6 +289,7 @@ public class InGame extends GameState{
             }
                 catch(SocketException | ConnectTimeoutException se)
             {
+                //Timeout or no adapter to initiate connection on
                 Log.e("Network","Networking Problems :(   :");
                 se.printStackTrace();
                 disconnect();
@@ -252,16 +317,23 @@ public class InGame extends GameState{
         }
 
         public synchronized void stop() {
+            Log.e("Network","Stopping Network Thread");
             if(thread != null)
             {
                 if(communicator != null && !communicator.isShutdown())
                 {
+                    Log.e("Network","Shutting Down Communicator");
                     communicator.shutdown();
-                    communicator.close();
-                    communicator.destroy();
+                    //Log.e("Network","Closing Communicator");
+                    //communicator.close();
+                    //Log.e("Network","Destroying Communicator");
+                    //communicator.destroy();
                 }
                 try {
+                    Log.e("Network","Joining Thread");
                     thread.join(1);
+                    thread = null;
+                    Log.e("Network","Thread Joined");
                 } catch (InterruptedException e) {
                     Log.e("Network","Unable to join network thread");
                 }
@@ -277,6 +349,22 @@ public class InGame extends GameState{
         Sphere paddleBoundingSphere = new Sphere(new Point(pos.x, pos.y, pos.z), 0.2f);
 
         paddlePressed = intersects(paddleBoundingSphere, ray);
+
+        //Plane plane = new Plane(new Point(0, 0, 0.14f), new Vector(0, 0, 1.0f));
+        //Point touchedPoint = intersectionPoint(ray, plane);
+
+        //Text t = (Text) gameObjects.get(11);
+
+        //if(contains(t.getTopLeftBound(), t.getBottomRightBound(), touchedPoint))
+        //{
+        //    t.setPressed(true, t.getText());
+        //}
+
+    }
+
+    public boolean contains(Point topLeft, Point bottomRight, Point doesContain)
+    {
+        return doesContain.x > topLeft.x && doesContain.x < bottomRight.x && doesContain.y < topLeft.y && doesContain.y > bottomRight.y;
     }
 
     @Override
@@ -289,6 +377,19 @@ public class InGame extends GameState{
             ((Paddle) gameObjects.get(2 + side)).setTouchX(touchedX);
 
         }
+    }
+
+    @Override
+    public void handleTouchRelease(float normalisedX, float normalisedY, Ray ray)
+    {
+
+        //Text t = (Text) gameObjects.get(11);
+
+        //if(t.isPressed())
+        //{
+        //    t.setPressed(false, t.getText());
+        //    flagChange = true;
+        //}
     }
 
     private boolean intersects(Sphere sphere, Ray ray)
