@@ -29,6 +29,21 @@ public class Vector {
                 this.z + other.z);
     }
 
+    public Vector crossProduct(Vector other)
+    {
+        return new Vector(
+                (y * other.z) - (z * other.y),
+                (z * other.x) - (x * other.z),
+                (x * other.y) - (y * other.x)
+        );
+    }
+
+    public float dotProduct(Vector other) {
+        return x * other.x
+                + y * other.y
+                + z * other.z;
+    }
+
     public static Vector random2DNormalisedVector(float speed){
         Random r = new Random();
         final int directionInDegrees = r.nextInt(360);
@@ -36,4 +51,5 @@ public class Vector {
         final float y = (float) Math.cos(Math.toRadians(directionInDegrees)) * speed;
         return new Vector(x, y, 0);
     }
+
 }
